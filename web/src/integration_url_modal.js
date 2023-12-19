@@ -32,12 +32,32 @@ export function show_generate_integration_url_modal(api_key) {
         let selected_integration = "";
         let stream_input_dropdown_widget;
         let integration_input_dropdown_widget;
+        let events_param = "";
 
         const $override_topic = $("#integration-url-override-topic");
         const $topic_input = $("#integration-url-topic-input");
         const $integration_url = $("#generate-integration-url-modal .integration-url");
         const $dialog_submit_button = $("#generate-integration-url-modal .dialog_submit_button");
-
+        const $show_event_types = $("#show-event-types");
+        const $checkbox_ui = $("#checkbox-ui");
+        const $filter_event_checkbox = $("#filter-event-checkbox");
+        const $check_all_button = $("#check-all-events");
+        const $uncheck_all_button = $("#uncheck-all-events");
+        $show_event_types.on("change", () => {
+            $checkbox_ui.toggleClass("hide", !$show_event_types.prop("checked"));
+            update_url();
+        });
+        $(document).on("change", ".integration-event-checkbox", () => {
+            update_url(true);
+        });
+        $check_all_button.on("click", () => {
+            $(".integration-event-checkbox").prop("checked", true);
+            update_url(true);
+        });
+        $uncheck_all_button.on("click", () => {
+            $(".integration-event-checkbox").prop("checked", false);
+            update_url(true);
+        });
         $dialog_submit_button.prop("disabled", true);
 
         new ClipboardJS("#generate-integration-url-modal .dialog_submit_button", {
@@ -57,7 +77,7 @@ export function show_generate_integration_url_modal(api_key) {
             update_url();
         });
 
-        function update_url() {
+        function update_url(is_event_checkbox_change = false) {
             selected_integration = integration_input_dropdown_widget.value();
             if (selected_integration === default_integration_option.unique_id) {
                 $integration_url.text(default_url_message);
@@ -67,7 +87,6 @@ export function show_generate_integration_url_modal(api_key) {
 
             const stream_id = stream_input_dropdown_widget.value();
             const topic_name = $topic_input.val();
-
             const params = new URLSearchParams({api_key});
             if (stream_id !== -1) {
                 params.set("stream", stream_id);
@@ -76,9 +95,36 @@ export function show_generate_integration_url_modal(api_key) {
                 }
             }
 
+            const selected_integration_data = page_params.realm_incoming_webhook_bots.find(
+                (bot) => bot.name === selected_integration,
+            );
+
+            if (
+                selected_integration_data.all_event_types !== null &&
+                !is_event_checkbox_change &&
+                $show_event_types.prop("checked")
+            ) {
+                const events = display_events(selected_integration_data.all_event_types);
+                $("#events-box").empty().append(events);
+                $(".integration-event-checkbox").prop("checked", true);
+                events_param = "";
+            } else if (is_event_checkbox_change) {
+                set_events_param();
+            } else {
+                $filter_event_checkbox.addClass("hide");
+                $checkbox_ui.addClass("hide");
+                $("#events-box").append("");
+                $show_event_types.prop("checked", false);
+            }
+            if (selected_integration_data.all_event_types !== null) {
+                $filter_event_checkbox.removeClass("hide");
+            }
+
+            set_events_param();
+
             const realm_url = page_params.realm_uri;
             const base_url = `${realm_url}/api/v1/external/`;
-            $integration_url.text(`${base_url}${selected_integration}?${params}`);
+            $integration_url.text(`${base_url}${selected_integration}?${params}${events_param}`);
             $dialog_submit_button.prop("disabled", false);
 
             if ($override_topic.prop("checked") && topic_name === "") {
@@ -155,10 +201,14 @@ export function show_generate_integration_url_modal(api_key) {
             if (user_selected_option === direct_messages_option.unique_id) {
                 $override_topic.prop("checked", false).prop("disabled", true);
                 $override_topic.closest(".input-group").addClass("control-label-disabled");
+                $show_event_types.prop("checked", false).prop("disabled", true);
+                $show_event_types.closest(".input-group").addClass("control-label-disabled");
                 $topic_input.val("");
             } else {
                 $override_topic.prop("disabled", false);
                 $override_topic.closest(".input-group").removeClass("control-label-disabled");
+                $show_event_types.prop("disabled", false);
+                $show_event_types.closest(".input-group").removeClass("control-label-disabled");
             }
             $override_topic.trigger("change");
 
@@ -166,6 +216,34 @@ export function show_generate_integration_url_modal(api_key) {
             event.preventDefault();
             event.stopPropagation();
         }
+
+        function set_events_param() {
+            const $checked_check_boxes = $(".integration-event-checkbox:checked");
+            const selected_events = $checked_check_boxes
+                .map(function () {
+                    return $(this).val();
+                })
+                .get();
+            events_param =
+                selected_events.length > 0 ? `&only_events=${JSON.stringify(selected_events)}` : "";
+        }
+    }
+
+    function display_events(integrations) {
+        const checkboxes_html = integrations
+            .map(
+                (item) => `
+        <label>
+            <input type="checkbox"  class="integration-event-checkbox" checked=true  value="${item}" />
+            <span id="integration-event-name">
+            ${item}
+            </span>
+        </label>
+    `,
+            )
+            .join("");
+
+        return checkboxes_html;
     }
 
     dialog_widget.launch({
