@@ -36,6 +36,14 @@
             {{t "Filter events that will trigger notifications?"}}
         </label>
     </div>
+    <div class=" input-group hide" id="checkbox-ui">
+        <label for="events-box">{{t "Events to include:"}}</label>
+        <div class="integration-checkbox-button-container">
+            <button class="button rounded" id="check-all-events">{{t "Check all"}}</button>
+            <button class="button rounded" id="uncheck-all-events">{{t "Uncheck all"}}</button>
+        </div>
+        <div id="events-box" class="integration-event-layout"></div>
+    </div>
     <p class="integration-url-header">{{t "URL for your integration"}}</p>
     <div class="integration-url">
         {{default_url_message}}

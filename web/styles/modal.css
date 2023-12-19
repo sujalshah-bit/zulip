@@ -472,3 +472,19 @@
         }
     }
 }
+/* Styles for the checkbox UI grid */
+.integration-event-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 10px;
+}
+
+#integration-event-name{
+    word-break: break-all;
+}
+
+.integration-checkbox-button-container {
+    display: flex;
+    gap: 20px;
+    margin:10px 0; 
+}
