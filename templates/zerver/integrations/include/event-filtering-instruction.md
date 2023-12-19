@@ -1,4 +1,10 @@
-To filter the events that trigger the notifications, you can append
+To filter the events that trigger the notifications:
+
+Check the **[] Filter events that will trigger notifications?** option. Once selected, a UI will appear with checkboxes for different events and two buttons for convenience – **Check all** and **Uncheck all**.
+
+OR
+
+you can append
 either `&only_events=["event_a","event_b"]` or `&exclude_events=["event_a","event_b"]`
 (or both, with different events) to the URL you generated with an arbitrary
 number of supported events.
