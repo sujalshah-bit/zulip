@@ -27,6 +27,15 @@
         <input type="text" id="integration-url-topic-input" class="modal_text_input integration-url-parameter" maxlength="{{ max_topic_length }}" />
     </div>
     <hr />
+    <div id="filter-event-checkbox" class="input-group control-label-disabled hide">
+        <label class="checkbox">
+            <input type="checkbox" id="show-event-types" disabled />
+            <span></span>
+        </label>
+        <label class="inline" for="show-event-types">
+            {{t "Filter events that will trigger notifications?"}}
+        </label>
+    </div>
     <p class="integration-url-header">{{t "URL for your integration"}}</p>
     <div class="integration-url">
         {{default_url_message}}
