@@ -75,16 +75,17 @@
                 </div>
                 {{#with sub}}
                 <div class="stream_creator_details stream_details_subsection">
-                    {{#if creator}}
+                    {{#if creator_info.creator}}
                     {{#tr}}
                         Created by <z-user></z-user> on <z-stream-date-created></z-stream-date-created>.
                         {{#*inline "z-user"}}
                             {{> ../user_display_only_pill
                               is_inline=true
-                              user_id=creator.user_id
-                              img_src=creator.avatar_url
-                              display_value=creator.full_name
-                              is_current_user=is_creator }}
+                              user_id=creator_info.creator.user_id
+                              img_src=creator_info.creator.avatar_url
+                              display_value=creator_info.creator.full_name
+                              is_current_user=is_creator
+                              is_active=creator_info.is_active }}
                         {{/inline}}
                         {{#*inline "z-stream-date-created"}}{{date_created_string}}{{/inline}}
                     {{/tr}}
